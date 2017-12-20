@@ -55,21 +55,25 @@ module.exports = function (aws, options) {
 
     client.putBuffer(file.contents, uploadPath, headers, function(err, res) {
       if (err || res && res.statusCode !== 200) {
-        gutil.log(gutil.colors.red('[FAILED]', file.path + " -> " + uploadPath));
+        if (!options.quiet)
+          gutil.log(gutil.colors.red('[FAILED]', file.path + " -> " + uploadPath));
 
         if (err) {
-          gutil.log(gutil.colors.red('  AWS ERROR:', err));
+          if (!options.quiet)
+            gutil.log(gutil.colors.red('  AWS ERROR:', err));
           throw new Error(err);
         } 
         
         if (res && res.statusCode !== 200){
-          gutil.log(gutil.colors.red('  HTTP STATUS:', res.statusCode));
+          if (!options.quiet)
+            gutil.log(gutil.colors.red('  HTTP STATUS:', res.statusCode));
           throw new Error('HTTP Status Code: ' + res.statusCode);
         }
 
         finished(err, null)
       } else {
-        gutil.log(gutil.colors.green('[SUCCESS]') + ' ' + gutil.colors.grey(file.path) + gutil.colors.green(" -> ") + uploadPath);
+        if (!options.quiet)
+          gutil.log(gutil.colors.green('[SUCCESS]') + ' ' + gutil.colors.grey(file.path) + gutil.colors.green(" -> ") + uploadPath);
         res.resume();
         finished(null, file)
       }
